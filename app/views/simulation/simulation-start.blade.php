@@ -11,7 +11,7 @@
         {{ Form::open(array('url' => '/simular-eventos','role'=>'form')) }}
           <div class="form-group">
             <label for="cantidad">Ingresar el número de eventos a simular:</label>
-            <input type="number" class="form-control" id="cantidad" placeholder="" autofocus>
+            {{ Form::input('number', 'cantidad', '',array('class' => 'form-control', 'autofocus', 'min' => '1', 'max' => '10000')) }}
           </div>
           <button type="submit" class="btn btn-default">Simular</button>
         {{ Form::close() }}

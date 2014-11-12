@@ -20,9 +20,7 @@ class CreateRequerimientos extends Migration {
 			$table->decimal('C2', 5, 2);
 			$table->decimal('D1', 5, 2);
 			$table->decimal('D2', 5, 2);
-			$table->decimal('A', 5, 2);
-			$table->decimal('S1', 5, 2);
-			$table->decimal('S2', 5, 2);
+			$table->integer('estado_id')->unsigned();
 			$table->timestamps();
 		});
 	}

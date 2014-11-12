@@ -8,5 +8,10 @@ class InitInfoSeeder extends Seeder {
 		TipoEvento::create(array('nombre' => 'Arribo'));
 		TipoEvento::create(array('nombre' => 'Salida1'));
 		TipoEvento::create(array('nombre' => 'Salida2'));
+		Estado::create(array('nombre' => 'Cola1'));
+		Estado::create(array('nombre' => 'Servidor1'));
+		Estado::create(array('nombre' => 'Cola2'));
+		Estado::create(array('nombre' => 'Servidor2'));
+		Estado::create(array('nombre' => 'Salio'));
 	}
 }
