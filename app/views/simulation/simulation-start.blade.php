@@ -21,7 +21,7 @@
           </div>
           <div class="form-group">
             {{ Form::radio('simulation-type', '', false, ['id'=>'tiempo', 'class' => '', 'id' => 'time-simulation', 'onclick' => 'simulationType();']) }}
-            <label for="time-simulation">Simular por cantidad de eventos</label>
+            <label for="time-simulation">Simular por tiempo</label>
           </div>
           <div id="quant-simulation-selected" class="form-group no-display">
             <label for="cantidad">Ingresar el número de eventos a simular:</label>
