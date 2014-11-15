@@ -8,7 +8,11 @@
 
     <!-- Bootstrap -->
     {{ HTML::style('css/bootstrap.min.css') }}
-    {{ HTML::style('css/base-style.css') }}
+    {{ HTML::style('css/layouts/base-style.css') }}
+
+    @section('extra_css')
+    @show
+
   </head>
   <body>
     <div class="container">
@@ -19,5 +23,8 @@
     {{ HTML::script('js/jquery-1.11.1.min.js') }}
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     {{ HTML::script('js/bootstrap.min.js') }}
+
+    @section('extra_scripts')
+    @show
   </body>
 </html>
