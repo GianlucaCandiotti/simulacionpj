@@ -8,12 +8,12 @@ class SimulationController extends BaseController {
   private $x;
   private $event_array;
 
-  public function __construct($m = 30, $a = 17, $c = 31)
+  public function __construct($m = 60000000, $a = 17, $c = 31)
   {
     $this->m = pow ( 2, ceil( log($m)  / log( 2 ) ) );
     $this->a = $a;
     $this->c = $c;
-    $this->x = 2;
+    $this->x = idate('U');
     $this->event_array = array
     (
       'A' => 0,
@@ -25,7 +25,7 @@ class SimulationController extends BaseController {
   private function generateRandomNumbers($quant)
   {
     if($quant!=0){
-      $this->x = ($this->a * $this->x + $this->c) % $this->m;
+      $this->x = fmod(($this->a * $this->x + $this->c), $this->m);
       return number_format((($this->x / $this->m) + $this->generateRandomNumbers($quant-1.0)) , 10);
     }
     return 0;
@@ -103,7 +103,6 @@ class SimulationController extends BaseController {
         $prom_sis = $prom_sis + $evento->req_sistema * (min($next_event->time_A, $next_event->time_S1, $next_event->time_S2) - min($evento->time_A, $evento->time_S1, $evento->time_S2));
       }
     }
-
     $prom_d1 = $prom_d1/$i;
     $prom_d2 = $prom_d2/$j;
     $prom_cola1 = $prom_cola1/$total_time;
@@ -154,7 +153,7 @@ class SimulationController extends BaseController {
         $new_event->time_S2 = $this->event_array['S2'];
         $new_event->next_req_to_A = 2;
         $new_event->next_req_to_S1 = 1;
-        $new_event->next_req_to_S2 = 0;
+        $new_event->next_req_to_S2 = 1;
         $new_event->req_sistema = 1;
         $new_event->req_cola1 = 0;
         $new_event->req_cola2 = 0;
@@ -246,6 +245,8 @@ class SimulationController extends BaseController {
             $new_event->requerimiento_id = $req_out->id;
             $new_event->tipo_evento_id = 2;
 
+            $this->event_array['S1'] = '9999';
+
             if($last_event->req_cola1 > 0){
               $req_in = Requerimiento::find($next_req_to_S1 + 1);
               $req_in->D1 = $req_out->C1 - $req_in->T;
@@ -262,7 +263,6 @@ class SimulationController extends BaseController {
               $req_out->estado_id = 4;
               $req_out->D2 = 0;
 
-              $new_event->next_req_to_S2 = $next_req_to_S2 + 1;
               $new_event->req_cola2 = $last_event->req_cola2;
               $new_event->util_s2_flag = 1;
               $new_event->util_s2 = $last_event->util_s2;
@@ -286,13 +286,14 @@ class SimulationController extends BaseController {
             $new_event->req_sistema = $last_event->req_sistema - 1;
             $new_event->req_cola1 = $last_event->req_cola1;
             $new_event->req_cola2 = $last_event->req_cola2;
-            $new_event->util_s1_flag = $last_event->util_s2_flag;
+            $new_event->util_s1_flag = $last_event->util_s1_flag;
             $new_event->util_s2_flag = 0;
             $new_event->util_s1 = $last_event->util_s1 + $event_pass_time - $last_event->event_time;
             $new_event->util_s2 = $last_event->util_s2 + $event_pass_time - $last_event->event_time;
             $new_event->requerimiento_id = $req_out->id;
             $new_event->tipo_evento_id = 3;
 
+            $this->event_array['S2'] = '9999';
 
             if($last_event->req_cola2 > 0){
               $req_in = Requerimiento::find($next_req_to_S2 + 1);
@@ -300,8 +301,8 @@ class SimulationController extends BaseController {
               $req_in->estado_id = 4;
               $req_in->save();
 
-              $new_event->req_cola1 = $last_event->req_cola1 - 1;
-              $new_event->util_s1_flag = 1;
+              $new_event->req_cola1 = $last_event->req_cola2 - 1;
+              $new_event->util_s2_flag = 1;
 
               $this->event_array['S2'] = 'x';
             }

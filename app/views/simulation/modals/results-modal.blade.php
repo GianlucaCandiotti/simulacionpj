@@ -31,7 +31,7 @@
             <h4>
               Promedio de requerimientos en cola 2
             </h4>
-            <p><span class="glyphicon glyphicon-time"></span> {{number_format($prom_d2, 3)}}</p>
+            <p><span class="glyphicon glyphicon-time"></span> {{number_format($prom_cola2, 3)}}</p>
           </div>
         </div>
         <div class="row">

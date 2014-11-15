@@ -26,8 +26,8 @@ class CreateEventos extends Migration {
 			$table->integer('req_cola2');
 			$table->integer('util_s1_flag');
 			$table->integer('util_s2_flag');
-			$table->decimal('util_s1', 5, 2);
-			$table->decimal('util_s2', 5, 2);
+			$table->decimal('util_s1', 8, 2);
+			$table->decimal('util_s2', 8, 2);
 			$table->integer('requerimiento_id')->unsigned();
 			$table->integer('tipo_evento_id')->unsigned();
 			$table->timestamps();

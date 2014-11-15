@@ -15,11 +15,11 @@ class CreateRequerimientos extends Migration {
 		//
 		Schema::create('requerimientos', function($table){
 			$table->increments('id');
-			$table->decimal('T', 5, 2);
-			$table->decimal('C1', 5, 2);
-			$table->decimal('C2', 5, 2);
-			$table->decimal('D1', 5, 2);
-			$table->decimal('D2', 5, 2);
+			$table->decimal('T', 8, 2);
+			$table->decimal('C1', 8, 2);
+			$table->decimal('C2', 8, 2);
+			$table->decimal('D1', 8, 2);
+			$table->decimal('D2', 8, 2);
 			$table->integer('estado_id')->unsigned();
 			$table->timestamps();
 		});
