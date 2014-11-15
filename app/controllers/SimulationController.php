@@ -296,7 +296,7 @@ class SimulationController extends BaseController {
 
             if($last_event->req_cola2 > 0){
               $req_in = Requerimiento::find($next_req_to_S2 + 1);
-              $req_in->D2 = $req_out->C2 - $req_in->T + $req_in->D1;
+              $req_in->D2 = $req_out->C2 - $req_in->C1;
               $req_in->estado_id = 4;
               $req_in->save();
 
