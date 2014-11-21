@@ -15,4 +15,3 @@ Route::get('/', array('as' => 'redirectSimulation', 'uses' => 'HomeController@re
 Route::get('/simular-eventos', array('as' => 'showSimulation', 'uses' => 'SimulationController@showSimulation'));
 Route::post('/simular-eventos', array('as' => 'simulationPost', 'uses' => 'SimulationController@simulationPost'));
 Route::get('/resultados', array('as' => 'showResults', 'uses' => 'SimulationController@showResults'));
-Route::post('/resultados', array('as' => 'resultsPost', 'uses' => 'SimulationController@resultsPost'));

@@ -103,8 +103,12 @@ class SimulationController extends BaseController {
         $prom_sis = $prom_sis + $evento->req_sistema * (min($next_event->time_A, $next_event->time_S1, $next_event->time_S2) - min($evento->time_A, $evento->time_S1, $evento->time_S2));
       }
     }
-    $prom_d1 = $prom_d1/$i;
-    $prom_d2 = $prom_d2/$j;
+    if($prom_d1 != 0){
+      $prom_d1 = $prom_d1/$i;
+    }
+    if($prom_d2 != 0){
+      $prom_d2 = $prom_d2/$j;
+    }
     $prom_cola1 = $prom_cola1/$total_time;
     $prom_cola2 = $prom_cola2/$total_time;
     $prom_sis = $prom_sis/$total_time;
@@ -117,27 +121,26 @@ class SimulationController extends BaseController {
 
     $simulation_data = array
     (
-      'cantidad' => Input::get('cantidad')
+      'cantidad' => Input::get('cantidad'),
+      'tiempo' => Input::get('tiempo')
     );
 
-    $rules = array
-    (
-      'cantidad'=>'required'
-    );
+    if(isset($simulation_data['cantidad']) && $simulation_data['cantidad'] > 0){
+      $this->simulationMecanism('cantidad', $simulation_data['cantidad']);
+    }elseif(isset($simulation_data['tiempo']) && $simulation_data['tiempo'] > 0){
+      $this->simulationMecanism('tiempo', $simulation_data['tiempo']);
+    }
 
-    $messages = array(
-      'required'  => 'El campo :attribute es obligatorio.',
-    );
+    return Redirect::to('/resultados');
+  }
 
-		$validation = Validator::make(Input::all(), $rules, $messages);
-		if ($validation->fails())
-		{
-			return Redirect::route('showSimulation')
-                    ->withErrors($validation)
-                    ->withInput();
-		}
+  public function simulationMecanism($simulation_type, $rel_param)
+  {
+    $i = 1;
+    $param = 0;
+    $event_pass_time = 0;
 
-    for($i = 1; $i <= $simulation_data['cantidad']; $i++){
+    while($param < $rel_param){
       $new_event = new Evento;
       $new_requerimiento = new Requerimiento;
 
@@ -164,13 +167,17 @@ class SimulationController extends BaseController {
         $new_event->requerimiento_id = 1;
         $new_event->tipo_evento_id = 1;
         $new_event->save();
+
+        $event_pass_time = $this->event_array['A'];
         $this->event_array['A'] = 'x';
         $this->event_array['S1'] = 'x';
+
       }else{
         $last_event = Evento::find($i - 1);
         $next_req_to_A = $last_event->next_req_to_A;
         $next_req_to_S1 = $last_event->next_req_to_S1;
         $next_req_to_S2 = $last_event->next_req_to_S2;
+
         if($this->event_array['A'] == 'x'){
           $this->event_array['A'] = Requerimiento::find($next_req_to_A - 1)->T + $this->generateVariables('exponencial', 2);
         }
@@ -301,7 +308,7 @@ class SimulationController extends BaseController {
               $req_in->estado_id = 4;
               $req_in->save();
 
-              $new_event->req_cola1 = $last_event->req_cola2 - 1;
+              $new_event->req_cola2 = $last_event->req_cola2 - 1;
               $new_event->util_s2_flag = 1;
 
               $this->event_array['S2'] = 'x';
@@ -315,15 +322,23 @@ class SimulationController extends BaseController {
         $new_event->save();
 
       }
+
+      $i++;
+
+      if($simulation_type == 'cantidad'){
+        $param++;
+      }elseif($simulation_type == 'tiempo'){
+        $param = $event_pass_time;
+      }
+
     }
 
-    return Redirect::to('/resultados');
-  }
+    if($simulation_type == 'tiempo'){
+      $events = Evento::all();
+      $events->last()->delete();
+    }
 
-  public function resultsPost()
-  {
-    return View::make('simulation.simulation-results');
+    return false;
   }
-
 
 }

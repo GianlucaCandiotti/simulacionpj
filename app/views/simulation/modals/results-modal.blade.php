@@ -47,13 +47,13 @@
             <h4>
               Utilización del servidor 1
             </h4>
-            <p><span class="glyphicon glyphicon-time"></span> {{number_format($eventos->last()->util_s1, 3)}}</p>
+            <p><span class="glyphicon glyphicon-time"></span> {{number_format(($eventos->last()->util_s1 / $total_time), 3)}}</p>
           </div>
           <div class="col-md-6">
             <h4>
               Utilización del servidor 2
             </h4>
-            <p><span class="glyphicon glyphicon-time"></span> {{number_format($eventos->last()->util_s2, 3)}}</p>
+            <p><span class="glyphicon glyphicon-time"></span> {{number_format(($eventos->last()->util_s2 / $total_time), 3)}}</p>
           </div>
         </div>
       </div>
