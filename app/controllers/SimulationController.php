@@ -8,7 +8,7 @@ class SimulationController extends BaseController {
   private $x;
   private $event_array;
 
-  public function __construct($m = 60000000, $a = 17, $c = 31)
+  public function __construct($m = 60000000, $a = 13, $c = 31)
   {
     $this->m = pow ( 2, ceil( log($m)  / log( 2 ) ) );
     $this->a = $a;
@@ -53,11 +53,9 @@ class SimulationController extends BaseController {
         for($i=0; $i<$length; $i++){
           if($r < $param1[$i]){
             $result = $param1[$i];
+						break;
           }
         }
-        break;
-      default:
-        return false;
     }
     return $result;
   }
@@ -122,19 +120,84 @@ class SimulationController extends BaseController {
     $simulation_data = array
     (
       'cantidad' => Input::get('cantidad'),
-      'tiempo' => Input::get('tiempo')
+      'tiempo' => Input::get('tiempo'),
+      'arribo-dist' => Input::get('distribution-type-A'),
+      'salida1-dist' => Input::get('distribution-type-B'),
+      'salida2-dist' => Input::get('distribution-type-C'),
     );
 
+		$param1A = 0;
+		$param2A = 0;
+		$param1B = 0;
+		$param2B = 0;
+		$param1C = 0;
+		$param2C = 0;
+
+    switch($simulation_data['arribo-dist']){
+      case 'uniforme':
+				$param1A = Input::get('uniform-dist-1-A');
+				$param2A = Input::get('uniform-dist-2-A');
+        break;
+      case 'exponencial':
+				$param1A = Input::get('exponential-dist-1-A');
+        break;
+      case 'normal':
+				$param1A = Input::get('normal-dist-1-A');
+				$param2A = Input::get('normal-dist-2-A');
+				break;
+			case 'discreta':
+				$param1A = Input::get('discrete-dist-1-A');
+				$param1A = explode(" ", $param1A);
+				break;
+    }
+
+		switch($simulation_data['salida1-dist']){
+			case 'uniforme':
+				$param1B = Input::get('uniform-dist-1-B');
+				$param2B = Input::get('uniform-dist-2-B');
+				break;
+			case 'exponencial':
+				$param1B = Input::get('exponential-dist-1-B');
+				break;
+			case 'normal':
+				$param1B = Input::get('normal-dist-1-B');
+				$param2B = Input::get('normal-dist-2-B');
+				break;
+			case 'discreta':
+				$param1B = Input::get('discrete-dist-1-B');
+				$param1B = explode(" ", $param1B);
+				break;
+		}
+
+		switch($simulation_data['salida2-dist']){
+			case 'uniforme':
+				$param1C = Input::get('uniform-dist-1-C');
+				$param2C = Input::get('uniform-dist-2-C');
+				break;
+			case 'exponencial':
+				$param1C = Input::get('exponential-dist-1-C');
+				break;
+			case 'normal':
+				$param1C = Input::get('normal-dist-1-C');
+				$param2C = Input::get('normal-dist-2-C');
+				break;
+			case 'discreta':
+				$param1C = Input::get('discrete-dist-1-C');
+				$param1C = explode(" ", $param1C);
+				dd($this->generateVariables('discreta', $param1C));
+				break;
+		}
+
     if(isset($simulation_data['cantidad']) && $simulation_data['cantidad'] > 0){
-      $this->simulationMecanism('cantidad', $simulation_data['cantidad']);
+      $this->simulationMecanism('cantidad', $simulation_data['cantidad'], $simulation_data['arribo-dist'], $simulation_data['salida1-dist'], $simulation_data['salida2-dist'], $param1A, $param2A, $param1B, $param2B, $param1C, $param2C);
     }elseif(isset($simulation_data['tiempo']) && $simulation_data['tiempo'] > 0){
-      $this->simulationMecanism('tiempo', $simulation_data['tiempo']);
+      $this->simulationMecanism('tiempo', $simulation_data['tiempo'], $simulation_data['arribo-dist'], $simulation_data['salida1-dist'], $simulation_data['salida2-dist'], $param1A, $param2A, $param1B, $param2B, $param1C, $param2C);
     }
 
     return Redirect::to('/resultados');
   }
 
-  public function simulationMecanism($simulation_type, $rel_param)
+  public function simulationMecanism($simulation_type, $rel_param, $arribo_dist, $salida1_dist, $salida2_dist, $param1A, $param2A, $param1B, $param2B, $param1C, $param2C)
   {
     $i = 1;
     $param = 0;
@@ -151,6 +214,7 @@ class SimulationController extends BaseController {
         $new_requerimiento->D1 = 0;
         $new_requerimiento->save();
 
+				$new_event->event_time = $this->event_array['A'];
         $new_event->time_A = $this->event_array['A'];
         $new_event->time_S1 = $this->event_array['S1'];
         $new_event->time_S2 = $this->event_array['S2'];
@@ -179,16 +243,18 @@ class SimulationController extends BaseController {
         $next_req_to_S2 = $last_event->next_req_to_S2;
 
         if($this->event_array['A'] == 'x'){
-          $this->event_array['A'] = Requerimiento::find($next_req_to_A - 1)->T + $this->generateVariables('exponencial', 2);
+          $this->event_array['A'] = Requerimiento::find($next_req_to_A - 1)->T + $this->generateVariables($arribo_dist, $param1A, $param2A);
         }
         if($this->event_array['S1'] == 'x'){
-          $this->event_array['S1'] = Requerimiento::find($next_req_to_S1)->T + Requerimiento::find($next_req_to_S1)->D1 + $this->generateVariables('normal', 4, 1);
+          $this->event_array['S1'] = Requerimiento::find($next_req_to_S1)->T + Requerimiento::find($next_req_to_S1)->D1 + $this->generateVariables($salida1_dist, $param1B, $param2B);
         }
         if($this->event_array['S2'] == 'x'){
-          $this->event_array['S2'] = Requerimiento::find($next_req_to_S2)->C1 + Requerimiento::find($next_req_to_S2)->D2 + $this->generateVariables('normal', 4, 1);
+          $this->event_array['S2'] = Requerimiento::find($next_req_to_S2)->C1 + Requerimiento::find($next_req_to_S2)->D2 + $this->generateVariables($salida2_dist, $param1C, $param2C);
         }
 
         $event_pass_time = min($this->event_array['A'], $this->event_array['S1'], $this->event_array['S2']);
+
+				$new_event->event_time = $event_pass_time;
         $new_event->next_req_to_A = $next_req_to_A;
         $new_event->next_req_to_S1 = $next_req_to_S1;
         $new_event->next_req_to_S2 = $next_req_to_S2;
@@ -208,6 +274,7 @@ class SimulationController extends BaseController {
             $new_event->req_cola2 = $last_event->req_cola2;
             $new_event->util_s1_flag = $last_event->util_s1_flag;
             $new_event->util_s2_flag = $last_event->util_s2_flag;
+
             $new_event->util_s1 = $last_event->util_s1 + $event_pass_time - $last_event->event_time;
             $new_event->util_s2 = $last_event->util_s2 + $event_pass_time - $last_event->event_time;
             $new_event->requerimiento_id = $next_req_to_A;

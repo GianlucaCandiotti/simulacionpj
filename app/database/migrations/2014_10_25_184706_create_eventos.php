@@ -15,6 +15,7 @@ class CreateEventos extends Migration {
 		//
 		Schema::create('eventos', function($table){
 			$table->increments('id');
+			$table->decimal('event_time', 8, 2);
 			$table->decimal('time_A', 8, 2);
 			$table->decimal('time_S1', 8, 2);
 			$table->decimal('time_S2', 8, 2);
