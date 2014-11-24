@@ -58,6 +58,7 @@
         </div>
       </div>
       <div class="modal-footer center no-border">
+        <a class="button btn btn-primary btn-sm" target="_blank"href="{{route('chartResults')}} ">Mostrar Graficos</a>
       </div>
     </div>
   </div>

@@ -15,3 +15,13 @@ Route::get('/', array('as' => 'redirectSimulation', 'uses' => 'HomeController@re
 Route::get('/simular-eventos', array('as' => 'showSimulation', 'uses' => 'SimulationController@showSimulation'));
 Route::post('/simular-eventos', array('as' => 'simulationPost', 'uses' => 'SimulationController@simulationPost'));
 Route::get('/resultados', array('as' => 'showResults', 'uses' => 'SimulationController@showResults'));
+
+// chart routes
+Route::group(array('prefix'=>'/chart'),function(){
+	Route::get('/', array('as' => 'chartResults', 'uses' => 'SimulationController@chartResults'));
+	Route::post('/server1', 'SimulationController@server1');
+	Route::post('/server2', 'SimulationController@server2');
+	Route::post('/req_col_1', 'SimulationController@req_col_1');
+	Route::post('/req_col_2', 'SimulationController@req_col_2');
+	Route::post('/system', 'SimulationController@system');
+});
